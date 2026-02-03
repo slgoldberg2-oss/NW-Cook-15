@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📊 Valuation Worksheet Analysis</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 36px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .card {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .card h2 {
+            color: #667eea;
+            margin-bottom: 25px;
+            font-size: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e1e8ed;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 14px 30px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 400px;
+            padding: 15px;
+            border: 2px solid #e1e8ed;
+            border-radius: 10px;
+            font-family: 'Times New Roman', serif;
+            font-size: 14px;
+            resize: vertical;
+            line-height: 1.8;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        small {
+            color: #6c757d;
+            font-size: 12px;
+            display: block;
+            margin-top: 5px;
+        }
+
+        .helper-text {
+            background: #e7f3ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            color: #004085;
+            font-size: 14px;
+        }
+
+        .btn-small {
+            padding: 8px 16px;
+            font-size: 14px;
+            width: auto;
+        }
+
+        .pins-list {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .pin-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background: white;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            border: 1px solid #e1e8ed;
+        }
+
+        .pin-item button {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 5px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 14px;
+        }
+
+        table th {
+            background: #667eea;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #e1e8ed;
+        }
+
+        table tr:hover {
+            background: #f8f9fa;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>📊 Valuation Worksheet Analysis</h1>
+            <p>Cook County Reassessment Analysis Tool</p>
+        </div>
+
+        <!-- Page 1: Input Form -->
+        <div id="page1" class="page active">
+            <div class="card">
+                <h2>Property Analysis Survey</h2>
+                
+                <div class="helper-text">
+                    ✅ Complete all required fields. Add multiple PINs if analyzing combined properties.
+                </div>
+
+                <div class="form-group">
+                    <label>Property PINs (14 digits each) *</label>
+                    <div style="display: flex; gap: 10px;">
+                        <input 
+                            type="text" 
+                            id="pin-input" 
+                            placeholder="e.g., 16-25-103-046-0000"
+                            style="flex: 1;"
+                        >
+                        <button onclick="addPIN()" class="btn btn-small" type="button">Add PIN</button>
+                    </div>
+                    <small>Enter PINs one at a time. You can add multiple PINs.</small>
+                </div>
+
+                <div id="pins-container" class="pins-list" style="display: none;">
+                    <strong>Added PINs:</strong>
+                    <div id="pins-list"></div>
+                </div>
+
+                <div class="form-group">
+                    <label>Township *</label>
+                    <select id="township" required>
+                        <option value="">Select Township...</option>
+                        <option value="norwood-park">Norwood Park - 26</option>
+                        <option value="evanston">Evanston - 17</option>
+                        <option value="new-trier">New Trier - 23</option>
+                        <option value="elk-grove">Elk Grove - 16</option>
+                        <option value="maine">Maine - 22</option>
+                        <option value="northfield">Northfield - 25</option>
+                        <option value="barrington">Barrington - 10</option>
+                        <option value="leyden">Leyden - 20</option>
+                        <option value="wheeling">Wheeling - 38</option>
+                        <option value="palatine">Palatine - 29</option>
+                        <option value="schaumburg">Schaumburg - 35</option>
+                        <option value="niles">Niles - 24</option>
+                        <option value="hanover">Hanover - 18</option>
+                    </select>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Tax Year *</label>
+                        <input type="number" id="year" placeholder="e.g., 2025" min="2020" max="2030" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Tax Rate (%) *</label>
+                        <input type="number" id="tax-rate" step="0.001" placeholder="e.g., 6.995" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Equalization Factor *</label>
+                    <input type="number" id="eq-factor" step="0.0001" placeholder="e.g., 3.0355" required>
+                </div>
+
+                <div id="error-page1" class="error"></div>
+
+                <button onclick="analyzeProperty()" class="btn" style="margin-top: 20px;">
+                    Analyze Property
+                </button>
+            </div>
+        </div>
+
+        <!-- Page 2: Loading -->
+        <div id="page2" class="page">
+            <div class="card">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <h3>Analyzing Property Data...</h3>
+                    <p>Scraping assessment values and downloading valuation worksheet...</p>
+                    <p style="margin-top: 10px; color: #6c757d; font-size: 14px;">This may take 10-15 seconds</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Page 3: Report -->
+        <div id="page3" class="page">
+            <div class="card">
+                <h2>Valuation Analysis Report</h2>
+                
+                <div class="success">
+                    🎉 Analysis completed successfully!
+                </div>
+
+                <button onclick="copyReport()" class="btn" style="margin: 20px 0;">
+                    📋 Copy Report Text
+                </button>
+
+                <div class="form-group">
+                    <label>Report Text (Copy & Paste into Word)</label>
+                    <textarea id="report-text" readonly></textarea>
+                    <small>💡 Click "Copy Report Text" button above, then paste into Microsoft Word</small>
+                </div>
+
+                <button onclick="startOver()" class="btn btn-secondary" style="margin-top: 20px;">
+                    ➕ Analyze Another Property
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = window.location.origin + '/api';
+        let analysisData = null;
+        let pins = [];
+
+        function showPage(pageNum) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(`page${pageNum}`).classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function addPIN() {
+            const input = document.getElementById('pin-input');
+            const pin = input.value.trim();
+            const errorEl = document.getElementById('error-page1');
+            errorEl.style.display = 'none';
+
+            if (!pin) {
+                errorEl.textContent = '⚠️ Please enter a PIN';
+                errorEl.style.display = 'block';
+                return;
+            }
+
+            const cleanPin = pin.replace(/-/g, '');
+            if (cleanPin.length !== 14 || !/^\d{14}$/.test(cleanPin)) {
+                errorEl.textContent = '⚠️ Please enter a valid 14-digit PIN';
+                errorEl.style.display = 'block';
+                return;
+            }
+
+            if (pins.includes(pin)) {
+                errorEl.textContent = '⚠️ This PIN has already been added';
+                errorEl.style.display = 'block';
+                return;
+            }
+
+            pins.push(pin);
+            input.value = '';
+            updatePINsList();
+        }
+
+        function updatePINsList() {
+            const container = document.getElementById('pins-container');
+            const list = document.getElementById('pins-list');
+
+            if (pins.length === 0) {
+                container.style.display = 'none';
+                return;
+            }
+
+            container.style.display = 'block';
+            list.innerHTML = pins.map((pin, index) => `
+                <div class="pin-item">
+                    <span>${pin}</span>
+                    <button onclick="removePIN(${index})">Remove</button>
+                </div>
+            `).join('');
+        }
+
+        function removePIN(index) {
+            pins.splice(index, 1);
+            updatePINsList();
+        }
+
+        async function analyzeProperty() {
+            const errorEl = document.getElementById('error-page1');
+            errorEl.style.display = 'none';
+
+            // Validate PINs
+            if (pins.length === 0) {
+                errorEl.textContent = '⚠️ Please add at least one PIN';
+                errorEl.style.display = 'block';
+                return;
+            }
+
+            // Validate other inputs
+            const township = document.getElementById('township').value;
+            const year = parseInt(document.getElementById('year').value);
+            const taxRate = parseFloat(document.getElementById('tax-rate').value);
+            const eqFactor = parseFloat(document.getElementById('eq-factor').value);
+
+            if (!township || !year || !taxRate || !eqFactor) {
+                errorEl.textContent = '⚠️ Please fill in all required fields';
+                errorEl.style.display = 'block';
+                return;
+            }
+
+            // Show loading
+            showPage(2);
+
+            try {
+                const response = await fetch(`${API_URL}/analyze`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        pins,
+                        township,
+                        year,
+                        taxRate,
+                        eqFactor
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to analyze property');
+                }
+
+                analysisData = await response.json();
+
+                // Generate report
+                const reportText = buildReport();
+                document.getElementById('report-text').value = reportText;
+
+                // Show report page
+                showPage(3);
+
+            } catch (error) {
+                console.error('Error:', error);
+                showPage(1);
+                errorEl.textContent = `❌ Error: ${error.message}`;
+                errorEl.style.display = 'block';
+            }
+        }
+
+        function buildReport() {
+            const data = analysisData;
+            
+            let report = `Valuation Worksheet Analysis\n`;
+            
+            // Extract key fields from valuation table first
+            let address = '';
+            let subclass2 = '';
+            let adjustedPGI = '';
+            let vcRate = '';
+            let egi = '';
+            let expenseRatio = '';
+            let noi = '';
+            let capRate = '';
+            let marketValue = '';
+            
+            if (data.valuationTable && data.valuationTable.length > 0) {
+                data.valuationTable.forEach(item => {
+                    const field = item.field.toLowerCase();
+                    
+                    if (field.includes('address')) {
+                        // Capitalize only first letter of each word
+                        address = item.value.toLowerCase().split(' ').map(word => 
+                            word.charAt(0).toUpperCase() + word.slice(1)
+                        ).join(' ');
+                    }
+                    else if (field.includes('subclass2')) {
+                        // Remove "#:" prefix and lowercase the description
+                        subclass2 = item.value.replace(/^\d+:/, '').trim().toLowerCase();
+                    }
+                    // Handle all PGI variations
+                    else if (field.includes('adjusted pgi') || field === 'pgi' || field.includes('est. pgi')) {
+                        adjustedPGI = item.value;
+                    }
+                    else if (field.includes('v/c')) vcRate = item.value;
+                    else if (field === 'egi') egi = item.value;
+                    else if (field.includes('% exp')) expenseRatio = item.value;
+                    else if (field === 'noi') noi = item.value;
+                    else if (field.includes('cap rate')) capRate = item.value;
+                    else if (field.includes('market value')) marketValue = item.value;
+                });
+            }
+
+            // Header section
+            report += `Property Address: ${address}\n`;
+            
+            // List all PINs
+            if (data.pins && data.pins.length > 0) {
+                report += `PINs: ${data.pins.map(p => p.pin).join(', ')}\n`;
+            }
+            
+            report += `Township: ${data.township}\n`;
+            report += `Reassessment Year: 2025\n`;
+            report += `Next Reassessment: 2028\n\n`;
+
+            // Paragraph 1: Introduction with classification
+            report += `In the reassessment year, the Assessor publishes the valuation methodology worksheet for all income-producing properties. The Assessor classified your property as a ${subclass2} property.\n\n`;
+
+            // Paragraph 2: Valuation methodology
+            // Use level of assessment from server (Total AV / Total MV)
+            const levelOfAssessment = data.current.levelOfAssessment || 0.10;
+            
+            // Calculate reassessment AV using the level of assessment
+            const reassessMarketValue = parseFloat(marketValue.replace(/[$,]/g, '')) || 0;
+            const reassessAV = Math.round(reassessMarketValue * levelOfAssessment);
+            
+            // Calculate reassessment taxes using submitted tax rate and EQ factor
+            const reassessTaxes = Math.round(reassessAV * (data.taxRate / 100) * data.eqFactor);
+            
+            // Use 'potential gross income' as generic term for all PGI variations
+            const pgiLabel = adjustedPGI ? 'potential gross income' : '';
+            
+            report += `The Assessor determined that this property has a market value of ${marketValue} based on the following valuation assumptions: ${pgiLabel ? pgiLabel + ' of ' + adjustedPGI + ', ' : ''}vacancy and collection loss of ${vcRate}, effective gross income of ${egi}, expense ratio of ${expenseRatio}, net operating income of ${noi}, capitalization rate of ${capRate}. The valuation upon reassessment supports an assessment of $${reassessAV.toLocaleString()}, which equates to estimated taxes of $${reassessTaxes.toLocaleString()}.\n\n`;
+
+            // Paragraph 3: Current assessment (simplified)
+            report += `Currently, your property is assessed at $${data.current.assessedValue.toLocaleString()}, which equates to estimated taxes of $${data.current.estimatedTaxes.toLocaleString()}.\n\n`;
+
+            // Closing
+            report += `Please contact us if you have any questions or would like to discuss appeal opportunities.`;
+
+            return report;
+        }
+
+        function copyReport() {
+            const textarea = document.getElementById('report-text');
+            navigator.clipboard.writeText(textarea.value).then(() => {
+                alert('✅ Report text copied to clipboard!\n\nYou can now paste it into Microsoft Word.');
+            }).catch(err => {
+                console.error('Copy failed:', err);
+                alert('📋 Report text is ready in the box.\n\nPlease select all text and copy manually (Ctrl+C or Cmd+C).');
+            });
+        }
+
+        function startOver() {
+            analysisData = null;
+            pins = [];
+            document.getElementById('pin-input').value = '';
+            document.getElementById('township').value = '';
+            document.getElementById('year').value = '';
+            document.getElementById('tax-rate').value = '';
+            document.getElementById('eq-factor').value = '';
+            updatePINsList();
+            showPage(1);
+        }
+    </script>
+</body>
+</html>
